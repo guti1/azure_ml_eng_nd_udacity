@@ -1,0 +1,12 @@
+pandas
+seaborn
+sklearn
+numpy
+lightgbm
+xgboost
+azureml
+azureml-sdk
+ipywidgets
+progressbar
+jupyterlab
+python-dotenv
