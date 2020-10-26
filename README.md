@@ -4,10 +4,9 @@ Resources and projects for Udacity's Azure ML engineer nanodegree
 
 ## 1. Setting up your environment.
 
-We use docker, thus the dev-env is set up based on the [Dockerfile](./Dockerfile), the requirements are defined in the 
-[requirements.txt](./requirements.txt). Please be aware that our env is based on the tf-jupyter Docker image, thus 
-it can be considered as quite heavy, but since to solve the project we also would like to experiment with different 
-models, approaches I chose this as my primary dev env.  
+We use docker, thus the dev-env is set up based on the [Dockerfile](./Dockerfile), the dependencies are managed by [Poetry](https://python-poetry.org/). 
 
-We store our azure-id in a `.env` file in the project root. Thus before executing all the subsequent notebook, code, 
-please make sure it is correctly set up, or just modify the notebooks to your needs accordingly.  
+- Clone the repo, create a `.env` file in the project root with your azure subscription-id.
+- Build the docker image by `docker-compose build --force-rm`.
+- Start jupyterlab by `docker-compose up jupyter`
+- You can add additional packages with poetry by `poetry add...` and `poetry install..,` etc.
