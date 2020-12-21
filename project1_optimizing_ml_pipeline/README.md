@@ -48,6 +48,15 @@ values. Thus, our 'baseline' accuracy could be 0.887 if we predict `no` as our m
 anything. We could approach the issue by e.g. with a sampling based approach (e.g. over/under sampling, or a synthetic 
 minority oversampling technique (SMOTE)), or we could use cost sensitive learning as well, by weighting our samples.
 
+We use the original data from the UCI Machine Learning Repository, which consists 3 separate datasets, namely:
+- train dataset with 32950 records
+- validation dataset with 4118 records
+- test dataset with 4120 records
+
+Since the above 3 datasets are available for AzureML, only the data path (URL) were slightly modified to get 
+the 3 datasets for our pipeline. An alternative would be just use the 'train' part and apply scikit-learn's 
+[train_test_split](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html) 
+function. Note: to ensure reproducibility seed should be fixed (`random_state`). 
 
 First we just use the provided example for preprocessing, maybe as next step we would evaluate the above mentioned
 alternatives. During the preprocessing we are executing the following steps as basic feature-engineering:
