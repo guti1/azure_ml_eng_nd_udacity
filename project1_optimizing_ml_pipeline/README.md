@@ -115,10 +115,11 @@ The final performance on the test set was:
 
 Next steps / TODO:
  - [ ] Deprecate SKLearn estimator type function in the favour of `ScriptRunConfig`
- - [ ] Review data-preprocessing steps - onehotencoding, etc.
- - [ ] Refactor notebook as series of azure-pipeline steps for better reproducibility
+ - [ ] Review data-preprocessing steps - onehotencoding, further feature engineering, handle imbalanced classes.
+ - [ ] Refactor exec notebook as series of azure-pipeline steps for better reproducibility
 
 Known issues:
 Unfortunately executing `poetry add azureml-train-automl-runtime` will result in never ending dependency resolution, 
-thus it is not included in the project dependencies. However executing `poetry run pip istall azureml-train-automl-runtime`
-is sucessully installing the necessary package to execute a model resulting from a remote autoML run locally.
+thus it is not included in the project dependencies. However executing 
+`poetry run pip istall azureml-train-automl-runtime` successfully installs the necessary package to execute a model 
+resulting from a remote autoML run locally.
