@@ -1,14 +1,30 @@
-FROM tensorflow/tensorflow:2.3.1-jupyter
+FROM python:3.7.7
+
+ENV PYTHONUNBUFFERED=1
 
 USER root
-RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 ENV DEBIAN_FRONTEND noninteractive
 
-COPY requirements.txt requirements.txt
+RUN apt-get update && apt-get install -y apt-utils build-essential
+
+RUN curl -sL https://deb.nodesource.com/setup_current.x | bash -
+RUN apt-get install -y nodejs
+
+COPY . /app
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install poetry==1.1.4
+COPY poetry.lock pyproject.toml ./
+
+RUN poetry config virtualenvs.create false \
+  && poetry install
+
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+#COPY requirements.txt requirements.txt
+
+#RUN pip install -r requirements.txt
 
 EXPOSE 8888
 
-WORKDIR /tf
+WORKDIR /app
