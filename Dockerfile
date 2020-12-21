@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.7.7
 
 ENV PYTHONUNBUFFERED=1
 
@@ -7,8 +7,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y apt-utils build-essential
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN  apt-get install -y  nodejs npm
+RUN curl -sL https://deb.nodesource.com/setup_current.x | bash -
+RUN apt-get install -y nodejs
 
 COPY . /app
 
