@@ -30,10 +30,8 @@ show how to set up the above pipeline from a jupyter-notebook and execute it thr
 hyperparameter tuning part we use Hyperdrive functionality of the ML-studio. 
 
 As an alternative to our classical ml-pipeline we also evaluate the achievable performance by the Azure AutoML framework
-as well. First we present the steps and the following results in a notebook. 
- 
-Results: -> summary
-    
+as well. First we present the steps and the following results in a [notebook](./udacity_project1_solution.ipynb). 
+
 
  ## 3. Scikit-learn pipeline
 As a benchmark implementation we chose the 
@@ -113,12 +111,14 @@ The final performance on the test set was:
 2. AutoML - VotingEnsemble: 0.9163
 3. Hyperdrive -  LogisticRegression: 0.9112
 
-Next steps / TODO:
+## 6. Next steps / TODO / misc:
+ - [ ] Present resulting models from the model-dumps in a standalone notebook.
  - [ ] Deprecate SKLearn estimator type function in the favour of `ScriptRunConfig`
  - [ ] Review data-preprocessing steps - onehotencoding, further feature engineering, handle imbalanced classes.
  - [ ] Refactor exec notebook as series of azure-pipeline steps for better reproducibility
 
 Known issues:
+
 Unfortunately executing `poetry add azureml-train-automl-runtime` will result in never ending dependency resolution, 
 thus it is not included in the project dependencies. However executing 
 `poetry run pip istall azureml-train-automl-runtime` successfully installs the necessary package to execute a model 
