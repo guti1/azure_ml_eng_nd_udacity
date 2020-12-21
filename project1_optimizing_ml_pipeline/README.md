@@ -38,7 +38,7 @@ As a benchmark implementation we chose the
 [logistic-regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) 
 from the scikit-learn package. As a first iteration we execute the complete pipeline in a single step, namely: 
 1. Preprocess and cleanse the data
-2. Model-fitting
+2. Model-fitting / hyperparameter tuning 
 3. Evaluation on a held-out-set
  
 ### 3.a. Data
@@ -49,18 +49,31 @@ anything. We could approach the issue by e.g. with a sampling based approach (e.
 minority oversampling technique (SMOTE)), or we could use cost sensitive learning as well, by weighting our samples.
 
 
-First we just use the provided example for preprocessing, maybe as next step we vould evaluate the above mentioned
-alternatives. 
+First we just use the provided example for preprocessing, maybe as next step we would evaluate the above mentioned
+alternatives. During the preprocessing we are executing the following steps as basic feature-engineering:
+1. the variable `job` is one-hot-encoded to dummy variables using pandas's 
+   [get_dummies](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.get_dummies.html).
+   
+2. binary variables as `marital`, `default`, `housing`, `loan` are encoded to numerical binary varibales (0/1).
+3. `contact` and `education` are also one-hot-encoded, also with `get_dummies()`.
+4. `month` and `day_of_week` variables are just recoded to numerical values (note: problematic, interpretation could be 
+   flawed)
+   
+5. the target variable `y` is also recoded to numerical binary (yes/no -> 1/0).
+6. as last step we return the prepared data as a tuple, namely the first part is the DataFrame with all the features 
+   (`x_df`) and the vector of our target variable (`y_df`, dropped from the previous df).
 
 ### 3.b Algorithms
 As baseline solution for the classification problem we choose logistic regression. In the scikit-learn implementation 
-we choose to optimize the `C` regularization parameter along with the `max_iter` prameter for controlling the possible 
+we choose to optimize the `C` regularization parameter along with the `max_iter` parameter for controlling the possible 
 number of iteration until the algorithm converge. We use the BanditPolicy for the optimization, 
 the details about it can be found 
 [here](https://docs.microsoft.com/hu-hu/python/api/azureml-train-core/azureml.train.hyperdrive.banditpolicy?view=azure-ml-py).
 
 The optimization policy defines the early termination strategy of the executed runs, namely un that doesn't fall within 
 the slack factor or slack amount of the evaluation metric with respect to the best performing run will be terminated. 
+The early termination policy helps with the compute efficiency since it cancels the least promising runs during the 
+experiment.
 
 As a `challenger` model we use [Lightgbm](https://github.com/microsoft/LightGBM), which is a learning algorithm based on
 decision-tree based weak learners which are fit on the training set sequentially (boosting). Since lgbm has a lot of 
@@ -75,9 +88,15 @@ to optimize a few from them:
 
 For the logistic regression we use random parameter sampling for the logistic-regression case and bayesian parameter
 sampling for the lgbm run. In random sampling, hyperparameter values are randomly selected from the defined search 
-space. The bayesian algorithm  picks samples based on how previous samples performed, so that new samples improve the 
+space. However grid search is reliable on low dimensional spaces (1-d, 2-d) (note: our current logistic regression 
+example is isa 2-d example), it is shown that in search spaces with higher dimensions random search is more efficient 
+than grid search. For the details please see the following 
+[paper](https://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf).
+
+The bayesian algorithm  picks samples based on how previous samples performed, so that new samples improve the 
 primary metric. In that case it is recommended to set the number of runs greater than or equal to 20 times the number of 
-hyperparameters being tuned. 
+hyperparameters being tuned. One can argue, that the bayesian algorithm takes "smarter" decisions, since it takes into 
+account the results from previous experiments before scheduling the next trials. 
 
 During the hyperdrive runs we choose accuracy as our primary metric, and we would like to maximize it. 
 
@@ -101,21 +120,41 @@ datasets which were made available to our workspace in a previous step.
 After the execution the job, it resulted in 
 [VotingEnsemble](https://docs.microsoft.com/en-gb/python/api/azureml-train-automl-runtime/azureml.train.automl.runtime.ensemble.votingensemble?view=azure-ml-py) 
 as the best performing model, based on the validation set. As in the previous experiments we downloaded the resulting 
-model and evaluated it on the held-out test set.
+model and evaluated it on the held-out test set. The VotingEnsemble model can be considered as a  meta-model or a 
+model-of models, since it combines the predictions from multiple other models.
 
 ## 5. Results - pipeline comparison
 
 The full pipeline can be found in the notebook located [here](./udacity_project1_solution.ipynb). 
 The final performance on the test set was:
-1. Hyperdrive - lgbm: 0.9175
+1. Hyperdrive - lgbm: 0.9175 
 2. AutoML - VotingEnsemble: 0.9163
 3. Hyperdrive -  LogisticRegression: 0.9112
+
+Thus the lightgbm model was the best performing, however only by a very small margin, with the following parameters:
+```
+['--learning_rate', '0.05295908360909255', 
+'--max_depth', '15', 
+'--num_leaves', '50', 
+'--min_data_in_leaf', '15', 
+'--num_iterations', '200']
+```
 
 ## 6. Next steps / TODO / misc:
  - [ ] Present resulting models from the model-dumps in a standalone notebook.
  - [ ] Deprecate SKLearn estimator type function in the favour of `ScriptRunConfig`
  - [ ] Review data-preprocessing steps - onehotencoding, further feature engineering, handle imbalanced classes.
  - [ ] Refactor exec notebook as series of azure-pipeline steps for better reproducibility
+
+As next step to further improve the model accuracy we could do some further feature engineering steps in our pipeline, 
+namely, instead of just recoding variables as the months from factors to numerical variables, they should 
+one-hot-encoded since the months do not have "numerical" meaning, e.g. "February is not equal to 2x January...". 
+Embeddings could also help, however they also add a significant amount of complexity. 
+The `duration` variable should also dropped, since it is highly correlated with our target variable, and it is not 
+known ex-post for generating predictions. We should also prepare our pipeline for new, previously not seen categories, 
+to handle them as robustly as possible.
+
+
 
 Known issues:
 
