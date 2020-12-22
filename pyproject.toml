@@ -17,6 +17,7 @@ azureml-widgets = "^1.19.0"
 widgetsnbextension = "^3.5.1"
 ipywidgets = "^7.5.1"
 xgboost = "0.90"
+matplotlib = "^3.3.3"
 
 [tool.poetry.dev-dependencies]
 
