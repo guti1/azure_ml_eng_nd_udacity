@@ -21,9 +21,8 @@ RUN poetry config virtualenvs.create false \
 
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
-#COPY requirements.txt requirements.txt
 
-#RUN pip install -r requirements.txt
+
 
 EXPOSE 8888
 
